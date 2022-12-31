@@ -1,4 +1,5 @@
 <template>
+<!--  must remove all references to 'this'-->
   <div class="container">
     <div class="row">
       <div class="col">
@@ -23,18 +24,18 @@
         <div>
           <div class="card-group">
 
-<!--            transition-group must be the wrapping element -->
+            <!--            transition-group must be the wrapping element -->
             <transition-group class="p-3 d-flex flex-wrap" tag="div" appear name="books">
 
 
-              <div v-for="b in this.books" :key="b.id">
+              <div v-for="b in books" :key="b.id">
                 <div class="card me-2 ms-1 mb-3" style="width: 10rem;"
-                     v-if="b.genres.some(item => item.id == this.currentFilter)  || currentFilter === 0">
+                     v-if="b.genres.some(item => item.id == currentFilter)  || currentFilter === 0">
 
                   <router-link :to="`/books/${b.slug}`">
-                  <img  class="card-img-top"
-                      :src="`${this.imgPath}/covers/${b.slug}.jpg`"
-                       :alt="`cover for ${b.title}`">
+                    <img  class="card-img-top"
+                          :src="`${imgPath}/covers/${b.slug}.jpg`"
+                          :alt="`cover for ${b.title}`">
                   </router-link>
 
                   <div class="card-body text-center">
@@ -62,82 +63,93 @@
 </template>
 
 <script>
-import {store} from "@/components/store";
+import {ref, onMounted} from "vue";
 
 export default {
-// eslint-disable-next-line vue/multi-word-component-names
-  name: "Books",
+  name: "BooksComposition",
+  emits: ["error"],
+  props: {},
 
-  data () {
-    return {
-      store,
-      ready: false,
-      imgPath: process.env.VUE_APP_IMAGE_URL,
-      books: {},
-      currentFilter: 0,
-    }
-  },
-  emits: ['error'],
-  beforeMount() {
-    fetch(process.env.VUE_APP_API_URL + '/books')
-        .then(response => response.json())
-        .then(data => {
-          if (data.error) {
-            this.$emit('error', data.message)
-          } else {
-            this.books = data.data.books
-            this.ready = true
-          }
-        }).catch(err => {
-          this.$emit('error', err)
+  setup(props, ctx) {
+    //setup state
+    let ready = ref(false)
+    let currentFilter = ref(0)
+    const imgPath = ref(process.env.VUE_APP_IMAGE_URL)
+    let books = ref({})
+
+  //  use onMounted lifecycle hook to get books
+    onMounted(() => {
+      console.log('composition component')
+      fetch(process.env.VUE_APP_API_URL + '/books')
+          .then(response => response.json())
+          .then(data => {
+            if (data.error) {
+              ctx.emit('error', data.message)
+            } else {
+              books.value = data.data.books
+              ready.value = true
+            }
+          }).catch(err => {
+              ctx.emit('error', err)
+      })
     })
-  },
-  methods: {
-      setFilter: function (filter) {
-        this.currentFilter = filter
-      }
+
+
+    function setFilter (filter) {
+      currentFilter.value = filter
+    }
+
+
+    // return data and methods
+    return {
+      currentFilter,
+      imgPath,
+      books,
+      setFilter,
+      ready
+    }
+
   }
 }
-
-
 </script>
 
+
 <style scoped>
-    .filters {
-      height: 2.5em;
-    }
+.filters {
+  height: 2.5em;
+}
 
-  .filter {
-    padding: 6px;
-    cursor: pointer;
-    border-radius: 6px;
-    transition: all 0.35s;
-    border: 1px solid silver;
-  }
+.filter {
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.35s;
+  border: 1px solid silver;
+}
 
-  .filter.active {
-    background: lightgreen;
-  }
+.filter.active {
+  background: lightgreen;
+}
 
-  .filter:hover {
-    background: lightgray;
-  }
+.filter:hover {
+  background: lightgray;
+}
 
-  .book-author, .book-genre {
-    font-size: 0.8em;
-  }
+.book-author, .book-genre {
+  font-size: 0.8em;
+}
 /*  transition styles */
-    .books-move {
-      transition: all 500ms ease-in-out 50ms;
-    }
-    .books-enter-active {
-      transition: all 500ms ease-in-out;
-    }
-    .books-leave-active {
-      transition: all 500ms ease-in;
-    }
-    .books-enter, .books-leave-to {
-      opacity: 0;
-    }
+.books-move {
+  transition: all 500ms ease-in-out 50ms;
+}
+.books-enter-active {
+  transition: all 500ms ease-in-out;
+}
+.books-leave-active {
+  transition: all 500ms ease-in;
+}
+.books-enter, .books-leave-to {
+  opacity: 0;
+}
 
 </style>

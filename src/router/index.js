@@ -1,13 +1,14 @@
 import {createRouter, createWebHistory} from "vue-router";
 import Body from "@/components/Body";
 import Login from "@/components/Login";
-import Books from "@/components/books/Books";
+// import Books from "@/components/books/Books";
 import BooksAdmin from "@/components/books/BooksAdmin";
 import Book from "@/components/books/Book";
 import BookEdit from "@/components/books/BookEdit";
 import Users from "@/components/users/Users";
 import UserEdit from "@/components/users/UserEdit";
 import Security from "@/components/security";
+import BooksComposition from "@/components/books/BooksComposition";
 
 const routes = [
     {
@@ -23,7 +24,8 @@ const routes = [
     {
         path: '/books',
         name: 'Books',
-        component: Books,
+        // component: Books,
+        component: BooksComposition
     },
     {
         path: '/books/:bookName',
