@@ -31,9 +31,12 @@
                 <div class="card me-2 ms-1 mb-3" style="width: 10rem;"
                      v-if="b.genres.some(item => item.id == this.currentFilter)  || currentFilter === 0">
 
+                  <router-link :to="`/books/${b.slug}`">
                   <img  class="card-img-top"
                       :src="`${this.imgPath}/covers/${b.slug}.jpg`"
                        :alt="`cover for ${b.title}`">
+                  </router-link>
+
                   <div class="card-body text-center">
                     <h6 class="card-title">{{b.title}}</h6>
                     <span class="book-author">{{b.author.author_name}}</span>

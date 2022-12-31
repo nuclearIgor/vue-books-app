@@ -2,7 +2,15 @@
   <HeaderComponent/>
 
     <div>
-      <router-view :key="componentKey" @success="success" @error="error" @warning="warning" @forceUpdate="forceUpdate"/>
+      <router-view v-slot="{Component}"
+          :key="componentKey" @success="success" @error="error" @warning="warning" @forceUpdate="forceUpdate">
+
+        <keep-alive include="Books">
+          <component :is="Component"/>
+        </keep-alive>
+
+      </router-view>
+
     </div>
 
   <FooterComponent/>
